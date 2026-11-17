@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>玩家代碼生成器 · 字母排序+數字相加</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ADFAFF, #D9D9FC, #FFD1E8);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            padding: 1rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 40px -12px rgba(80, 100, 140, 0.25);
+            max-width: 620px;
+            padding: 2rem;
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #1e2637;
+            text-shadow: none;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h1 span {
+            font-size: 1.9rem;
+        }
+
+        .subhead {
+            color: #4a5a72;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #5f7c9c;
+            padding-left: 1rem;
+            background: rgba(160, 184, 212, 0.12);
+            border-radius: 0 12px 12px 0;
+            line-height: 1.5;
+            font-weight: 400;
+            border-left-color: #a0b8d4;
+        }
+
+        .subhead code {
+            background: #2d3447;
+            color: #d4e0ff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 0 2px;
+        }
+
+        .input-area {
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: rgba(0, 0, 0, 0.4) 0px 5px 10px;
+            border-radius: 3rem;
+            padding: 0.35rem 0.35rem 0.35rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            transition: border 0.2s, box-shadow 0.2s;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-area:focus-within {
+            border-color: #344059;
+        }
+
+        .input-area input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 1.2rem;
+            padding: 0.9rem 0;
+            color: #1a1e2b;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            min-width: 0;
+            font-family: 'Segoe UI', Roboto, monospace;
+        }
+
+        .input-area input::placeholder {
+            color: #8a9bb5;
+            font-weight: 400;
+            font-size: 1rem;
+            letter-spacing: 0.2px;
+        }
+
+        .clear-btn {
+            background: transparent;
+            border: none;
+            color: #7b8aa3;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0.5rem 0.6rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            font-weight: 300;
+            flex-shrink: 0;
+            margin-right: 0.1rem;
+            width: 2.4rem;
+            height: 2.4rem;
+        }
+
+        .clear-btn:hover {
+            background: #263040;
+            color: #cbd6eb;
+        }
+
+        .error-msg {
+            color: #ff9f9f;
+            background: rgba(220, 80, 80, 0.15);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            padding: 0.9rem 1.4rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            margin: 1rem 0 0.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .error-msg.show {
+            display: flex;
+        }
+
+        .error-msg span {
+            font-size: 1.4rem;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            75% {
+                transform: translateX(6px);
+            }
+        }
+
+        .result-section {
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 2rem;
+            padding: 1.5rem 1.5rem 1.6rem;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 16px -8px rgba(80, 100, 140, 0.15);
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            color: #5a6d8c;
+            margin-bottom: 0.75rem;
+            padding-left: 0.25rem;
+        }
+
+        .code-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            background: rgba(240, 245, 255, 0.8);
+            border-radius: 2rem;
+            padding: 0.6rem 0.6rem 0.6rem 1.8rem;
+            border: 1px solid rgba(180, 200, 230, 0.8);
+            transition: border 0.15s;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .code-display:focus-within {
+            border-color: #6b8bb0;
+        }
+
+        .code-text {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #1e2637;
+            word-break: break-all;
+            line-height: 1.3;
+            text-shadow: none;
+            flex: 1;
+            min-width: 0;
+            padding: 0.2rem 0;
+        }
+
+        .code-text.placeholder {
+            color: #8a9bb5;
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-size: 1.4rem;
+            text-shadow: none;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .copy-btn {
+            background: #2e405b;
+            border: none;
+            color: #ecf3ff;
+            font-size: 1.15rem;
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+            border-radius: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 6px 0 #b8c6db, 0 8px 14px rgba(100, 130, 170, 0.2);
+            border-bottom: 2px solid #4d6b8f;
+            white-space: nowrap;
+            flex-shrink: 0;
+            letter-spacing: 0.3px;
+        }
+
+        .copy-btn:hover {
+            background: #3e5679;
+            transform: translateY(-1px);
+            box-shadow: 0 7px 0 #b8c6db, 0 10px 18px rgba(100, 130, 170, 0.3);
+        }
+
+        .copy-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #b8c6db, 0 4px 8px rgba(100, 130, 170, 0.2);
+        }
+
+        .copy-btn.copied {
+            background: #2e6b4b;
+            border-bottom-color: #4ba874;
+            box-shadow: 0 4px 0 #9bc9b1, 0 8px 14px rgba(50, 150, 100, 0.2);
+        }
+
+        .hint {
+            font-style: normal;
+            background: rgba(46, 64, 91, 0.1);
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            color: #4a5a72;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+            text-align: center;
+            max-width: 350px;
+            margin: auto;
+        }
+
+        .footer-spacer {
+            height: 0.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 1.6rem 1rem;
+            }
+
+            .code-display {
+                padding: 0.6rem 0.6rem 0.6rem 1.2rem;
+            }
+
+            .code-text {
+                font-size: 1.5rem;
+            }
+
+            .copy-btn {
+                padding: 0.8rem 1rem;
+                font-size: 1rem;
+            }
+
+            .input-area {
+                padding-left: 1rem;
+            }
+
+            .input-area input {
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+        }
+
+        svg {
+            fill: #ecf3ff;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>
+            <span>HIVE Backroom Code Generator</span>
+        </h1>
+        <!-- 輸入區 -->
+        <div class="input-area">
+            <input type="text" id="usernameInput" placeholder="Enter player name" autocomplete="off" spellcheck="false"
+                maxlength="60">
+            <button class="clear-btn" id="clearBtn" title="清除輸入" aria-label="清除">✕</button>
+        </div>
+
+        <!-- 錯誤訊息 -->
+        <div class="error-msg" id="errorMsg">
+            <span></span> Don't type random things, you idiot :P
+        </div>
+
+        <!-- 結果顯示區 -->
+        <div class="result-section">
+            <div class="result-label">your code</div>
+            <div class="code-display">
+                <div class="code-text placeholder" id="codeOutput">等待輸入…</div>
+                <button class="copy-btn" id="copyBtn">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path
+                            d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                    </svg>
+                    <span>COPY</span>
+                </button>
+            </div>
+            <div class="hint">
+                <p>Only English letters, numbers, and spaces are allowed.</p>
+            </div>
+        </div>
+        <div class="footer-spacer"></div>
+    </div>
+
+    <script>
+        (function () {
+            const usernameInput = document.getElementById('usernameInput');
+            const codeOutput = document.getElementById('codeOutput');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            // 正則：只允許英文字母(大小寫)、數字、空格
+            const ALLOWED_REGEX = /^[A-Za-z0-9 ]*$/;
+
+            // 存儲當前有效代碼 (用於複製)
+            let currentCode = '';
+
+            // 顯示錯誤 (並隱藏結果中的錯誤提示，也可以同時顯示)
+            function showError(show) {
+                if (show) {
+                    errorMsg.classList.add('show');
+                } else {
+                    errorMsg.classList.remove('show');
+                }
+            }
+
+            // 更新代碼輸出區域 (根據有效輸入)
+            function updateCode(rawInput) {
+                // 如果輸入包含非法字元 → 顯示錯誤，清空代碼顯示，禁用複製 (但仍然顯示等待輸入或無效)
+                if (!ALLOWED_REGEX.test(rawInput)) {
+                    // 非法字元
+                    showError(true);
+                    // 代碼顯示區域顯示無效提示，但不顯示具體內容
+                    codeOutput.textContent = 'Invalid input';
+                    codeOutput.classList.add('placeholder');
+                    currentCode = '';
+                    return;
+                }
+
+                // 合法輸入 (可能為空)
+                showError(false);
+
+                // 如果輸入為空 (或只有空格) → 顯示等待輸入
+                if (rawInput.trim() === '') {
+                    codeOutput.textContent = 'Waiting for input…';
+                    codeOutput.classList.add('placeholder');
+                    currentCode = '';
+                    return;
+                }
+
+                // 提取字母和數字，並轉換
+                let letters = '';
+                let digitSum = 0;
+
+                for (let i = 0; i < rawInput.length; i++) {
+                    const ch = rawInput[i];
+                    if (ch >= 'A' && ch <= 'Z') {
+                        letters += ch.toLowerCase();
+                    } else if (ch >= 'a' && ch <= 'z') {
+                        letters += ch;
+                    } else if (ch >= '0' && ch <= '9') {
+                        digitSum += parseInt(ch, 10);
+                    }
+                    // 空格忽略 (不加入字母也不加入數字)
+                }
+
+                // 字母排序 (a~z)
+                const sortedLetters = letters.split('').sort().join('');
+
+                // 數字總和轉為字串 (如果總和為0，但沒有數字？根據範例：有數字則相加，如果沒有數字則不顯示數字部分)
+                // 注意：如果數字部分完全沒有出現 (沒有任何數字)，digitSum 為 0，但我們不應該顯示 '0'。
+                // 需要檢查原始輸入中是否有數字字元。
+                const hasDigit = /[0-9]/.test(rawInput);
+
+                // 構建最終代碼：排序字母 + (如果有數字則加上總和)
+                let finalCode = sortedLetters;
+                if (hasDigit) {
+                    finalCode += digitSum.toString();
+                }
+
+                // 如果 finalCode 為空字串 (例如輸入只有空格，但前面已處理過) 或者只有數字但總和為0且字母為空？但digitSum為0且沒有字母則finalCode='0'
+                // 但特殊情況：輸入只有 "0" → 字母空，數字和0 → 最終 "0"，是合理的。
+                // 如果輸入只有空格，前面已返回。此處 finalCode 可能為空嗎？如果輸入只有空格已返回，如果輸入只有數字且數字和0? 例如輸入 "0" → finalCode="0"。但若輸入是 "00" → 和0 → "0"。正常。
+                // 但如果輸入只有字母而沒有數字，hasDigit=false，finalCode = sortedLetters。若字母也為空？不可能，因為trim不為空且無非法字元，要嘛有字母要嘛有數字。
+                if (finalCode === '') {
+                    // 極端狀況：輸入只有空格? 已過濾，但如果有看不見的字元? 此處保險
+                    codeOutput.textContent = 'Waiting for input…';
+                    codeOutput.classList.add('placeholder');
+                    currentCode = '';
+                    return;
+                }
+
+                // 更新顯示
+                codeOutput.textContent = finalCode;
+                codeOutput.classList.remove('placeholder');
+                currentCode = finalCode;
+            }
+
+            // 監聽輸入事件
+            usernameInput.addEventListener('input', function (e) {
+                const rawValue = e.target.value;
+                // 即時驗證並更新
+                updateCode(rawValue);
+            });
+
+            // 清除按鈕
+            clearBtn.addEventListener('click', function () {
+                usernameInput.value = '';
+                updateCode('');
+                showError(false);  // 清除錯誤
+                usernameInput.focus();
+            });
+
+            // 複製按鈕
+            copyBtn.addEventListener('click', async function () {
+                // 如果沒有有效代碼 (currentCode 為空字串或無效) 則不複製
+                if (!currentCode) {
+                    // 如果當前是無效輸入 (錯誤顯示中) 或者沒有輸入
+                    if (errorMsg.classList.contains('show')) {
+                        // 已經顯示錯誤訊息，無需額外動作，但可以提示
+                    } else {
+                        // 沒有代碼可以複製，可能只輸入了空格
+                    }
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(currentCode);
+                    // 複製成功反饋
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.classList.add('copied');
+                    copyBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        <span>COPY successful</span>
+                    `;
+                    setTimeout(() => {
+                        copyBtn.classList.remove('copied');
+                        copyBtn.innerHTML = originalHTML;
+                    }, 1500);
+                } catch (err) {
+                    // 如果 clipboard API 失敗，使用備用方法
+                    alert('Automatic copying is not possible, please copy manually:' + currentCode);
+                }
+            });
+
+            // 初始化 (空輸入)
+            updateCode('');
+            // 確保初始錯誤隱藏
+            showError(false);
+
+            // 額外小細節：當使用者輸入非法字元時，如果他們試圖輸入但是被檢測到，我們不會阻止輸入，但會顯示錯誤。
+            // 但為了避免玩家複製到無效代碼，我們在複製按鈕邏輯中已處理 currentCode 為空。
+            // 另外，用戶名輸入可能包含全形空格或其他空白？只允許半形空格，如果輸入全形空格則視為非法字元。
+            // 已有正則判斷。
+        })();
+    </script>
+</body>
+
+</html>
